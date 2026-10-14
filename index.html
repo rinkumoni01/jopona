@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JOPONA - Shop Online</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f6fa;color:#222}
+header{background:#087f5b;color:white;padding:17px 15px}
+.brand{font-size:29px;font-weight:bold;letter-spacing:2px}
+.tagline{font-size:13px;margin-top:4px}
+.search{width:100%;padding:13px;border:0;border-radius:9px;margin-top:15px;font-size:16px}
+main{padding:15px;max-width:900px;margin:auto}
+h2{font-size:20px}
+.categories{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px}
+.category{background:white;border-radius:10px;padding:13px;min-width:90px;text-align:center;cursor:pointer;border:1px solid #eee}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:white;border-radius:12px;padding:12px;box-shadow:0 2px 8px #0000000b}
+.photo{height:100px;display:flex;align-items:center;justify-content:center;font-size:52px;background:#f0faf5;border-radius:8px}
+.card h3{font-size:15px;margin:10px 0 6px}
+.price{font-weight:bold;color:#087f5b;margin:7px 0}
+button{background:#087f5b;color:white;border:0;padding:10px;border-radius:7px;cursor:pointer}
+.card button{width:100%}
+.cart{background:white;margin-top:18px;padding:15px;border-radius:12px}
+.cart button{margin-top:8px}
+footer{text-align:center;padding:22px;color:#666;font-size:13px}
+@media(min-width:650px){.products{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">🛍️ JOPONA</div>
+  <div class="tagline">Aapki pasand, aapke ghar tak!</div>
+  <input id="search" class="search" placeholder="Samaan khojein..." oninput="renderProducts()">
+</header>
+
+<main>
+  <h2>Apni category chunein</h2>
+  <div class="categories">
+    <div class="category" onclick="setCategory('All')">🛍️<br>Sabhi</div>
+    <div class="category" onclick="setCategory('Grocery')">🍚<br>Rashan</div>
+    <div class="category" onclick="setCategory('Vegetables')">🥦<br>Sabzi</div>
+    <div class="category" onclick="setCategory('Fashion')">👕<br>Fashion</div>
+    <div class="category" onclick="setCategory('Electronics')">📱<br>Electronics</div>
+  </div>
+
+  <h2>Popular Products</h2>
+  <div id="products" class="products"></div>
+
+  <div class="cart">
+    <h2>🛒 Aapka Cart (<span id="count">0</span>)</h2>
+    <div id="cartItems">Abhi cart khaali hai.</div>
+    <h3>Total: ₹<span id="total">0</span></h3>
+    <button onclick="checkout()">Order Karein</button>
+  </div>
+</main>
+
+<footer>© 2026 JOPONA · Online Shopping & Home Delivery</footer>
+
+<script>
+const products=[
+{id:1,name:'Chawal (1 kg)',price:60,cat:'Grocery',icon:'🍚'},
+{id:2,name:'Aloo (1 kg)',price:30,cat:'Vegetables',icon:'🥔'},
+{id:3,name:'Tamatar (1 kg)',price:40,cat:'Vegetables',icon:'🍅'},
+{id:4,name:'Doodh (1 litre)',price:60,cat:'Grocery',icon:'🥛'},
+{id:5,name:'T-Shirt',price:299,cat:'Fashion',icon:'👕'},
+{id:6,name:'Jute',price:499,cat:'Fashion',icon:'👟'},
+{id:7,name:'Headphones',price:399,cat:'Electronics',icon:'🎧'},
+{id:8,name:'Mobile Charger',price:199,cat:'Electronics',icon:'🔌'}
+];
+let category='All';
+let cart=[];
+
+function setCategory(c){
+category=c;
+renderProducts();
+}
+
+function renderProducts(){
+const q=document.getElementById('search').value.toLowerCase();
+const list=products.filter(p=>(category==='All'||p.cat===category)&&p.name.toLowerCase().includes(q));
+document.getElementById('products').innerHTML=list.map(p=>`
+<div class="card">
+<div class="photo">${p.icon}</div>
+<h3>${p.name}</h3>
+<div class="price">₹${p.price}</div>
+<button onclick="addToCart(${p.id})">+ Cart Mein Dalein</button>
+</div>`).join('');
+}
+
+function addToCart(id){
+cart.push(products.find(p=>p.id===id));
+renderCart();
+}
+
+function renderCart(){
+document.getElementById('count').textContent=cart.length;
+document.getElementById('total').textContent=cart.reduce((s,p)=>s+p.price,0);
+document.getElementById('cartItems').innerHTML=cart.length?
+cart.map((p,i)=>`${p.icon} ${p.name} — ₹${p.price} <button onclick="removeItem(${i})">Hataein</button>`).join('<br><br>'):'Abhi cart khaali hai.';
+}
+
+function removeItem(i){
+cart.splice(i,1);
+renderCart();
+}
+
+function checkout(){
+if(!cart.length){alert('Pehle cart mein samaan daalein.');return;}
+const items=cart.map(p=>p.name+' ₹'+p.price).join('\n');
+const total=cart.reduce((s,p)=>s+p.price,0);
+const message=prompt('Apna naam, mobile number aur poora delivery address likhein:');
+if(!message)return;
+const order='JOPONA ORDER\n'+items+'\nTotal: ₹'+total+'\nCustomer details: '+message;
+alert('Aapka order summary taiyar hai!\n\n'+order+'\n\nYeh demo hai. Order abhi kisi dukaan ko nahi bheja gaya hai.');
+}
+renderProducts();
+</script>
+</body>
+</html>
